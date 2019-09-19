@@ -21,6 +21,17 @@ stages:
       vmImage: $(vmImageName)
 
     steps:
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'Infra'
+        Contents: '**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'Infra'
+        publishLocation: 'Container'
+
     - task: DotNetCoreCLI@2
       displayName: Build
       inputs:
@@ -32,7 +43,7 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/publish_output'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/xyz-functions-app/publish_output'
         includeRootFolder: false
         archiveType: zip
         archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
@@ -40,13 +51,3 @@ stages:
 
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
       artifact: drop
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: 'Infra'
-        Contents: '**'
-        TargetFolder: $(Build.ArtifactStagingDirectory)/Infra$(Build.BuildId)
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)/Infra$(Build.BuildId)'
-        ArtifactName: 'Infra'
-        publishLocation: 'Container'
